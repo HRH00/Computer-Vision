@@ -10,7 +10,7 @@ def main():
     # Open the SVM classifier and test data unseen by the classifier
     try:
         with open('./Coursework/Hog_svm_classifier.pkl', 'rb') as f:
-            (svm_classifier,X_test,y_test) = pickle.load(f)
+            (svm_classifier,X_test,y_test) = pickle.load(f)##open cached data
     
 
         
