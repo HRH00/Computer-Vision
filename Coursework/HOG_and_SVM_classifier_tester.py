@@ -22,7 +22,8 @@ def main():
 
     except: # ERROR
         print("Cannot load Classifier - run HOG_and_SVM_classifier_trainer.py first")
-        
+    
+    input("Press Enter to Exit...")
     print("\nDONE - exiting program")
     
 if __name__=="__main__":
