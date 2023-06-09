@@ -340,49 +340,11 @@ def compute_image_features(kmeans, descriptors, k):
         image_features.append(normalized_histogram)
     return np.array(image_features)
 
-def get_hog_features(image):
-    winSize = (64,64)
-    blockSize = (16,16)
-    blockStride = (8,8)
-    cellSize = (8,8)
-    nbins = 9
-    derivAperture = 1
-    winSigma = 4.
-    histogramNormType = 0
-    L2HysThreshold = 2.0000000000000001e-01
-    gammaCorrection = 0
-    nlevels = 64
-    hog = cv.HOGDescriptor(winSize,blockSize,blockStride,cellSize,nbins,derivAperture,winSigma,
-                            histogramNormType,L2HysThreshold,gammaCorrection,nlevels)
-    winStride = (8,8)
-    padding = (8,8)
-    locations = ((10,20),)
-    hist = hog.compute(image,winStride,padding,locations)
-    return hist
-
-
-def extract_hog_features(images):
-    features = []
-    labels = []
-    x=0
-    for lab in images:
-
-        for img in lab:
-    
-            hog_features = get_hog_features(img)
-    #        features.sort(key=lambda x: x.distance)
-            features.append(hog_features)
-            labels.append(x)
-            print("HOG FEATURES", hog_features)
-        x+=1    
-
-    return (features, labels)
 
 #convert face labels into numerical representations
-def train_svm(features, labels):
+def train_svm(features, labels): 
     # Split data into training and testing subsets
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=0)
-
     # Train SVM classifier
     svm_classifier = svm.SVC()
     svm_classifier.fit(X_train, y_train)
@@ -443,7 +405,32 @@ def main():
     test_svm(svm_classifier, X_test, y_test)
     print(y_test)
 
+
+
+
+    cwd = os.getcwd()  
+    path = os.path.join(cwd,"SIFT_svm_classifier.pkl")
+    print("Saving\n",path,"\n")
+
+    with open(path, 'wb') as f:
+        pickle.dump((svm_classifier,X_test,y_test), f)
+    
+    cwd = os.getcwd()  
+    path = os.path.join(cwd,"Coursework","SIFT_svm_classifier.pkl")
+    print("Saving\n",path,"\n")
+   
+    with open(path, 'wb') as f:
+        pickle.dump((svm_classifier,X_test,y_test), f)
+
+
     print("DONE\n\nSaving Classifier")
+    name=('SIFT_svm_classifier.pkl')
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    path = os.path.join(dir_path,name)
+    with open(path, 'wb') as f:
+        pickle.dump((svm_classifier,X_test,y_test), f)
+
+
     # Create the label mapping dictionary
     
     
@@ -454,7 +441,7 @@ def main():
 #        pickle.dump(svm_classifier, f)
 #
 #    # Save the label encoding mapping
-#    with open('label_mapping.pkl', 'wb') as f:
+#    with open('./Coursework/SIFT_svm_classifier.pkl', 'wb') as f:
 #        pickle.dump(label_mapping, f)
 #
     #k = 6

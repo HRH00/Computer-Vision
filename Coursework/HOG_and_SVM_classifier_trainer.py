@@ -200,7 +200,7 @@ def main():
     labels=(getLabels())
     filePathArray = getFilePaths(PATH_TO_DATA, labels) 
     
-    #filePathArray=getSubsetOfData(filePathArray, 20)    ## smaller sample for debugging
+    filePathArray=getSubsetOfData(filePathArray,5)    ## smaller sample for debugging
 
     # Motion History Constant Variables
     Min_Delta = 50  
@@ -217,9 +217,17 @@ def main():
     svm_classifier, X_test, y_test = train_svm(hog_features, numerical_labels)
 
     # Save the SVM classifier
+    
     print("DONE\n\nSaving Classifier")
-    with open('./Coursework/Hog_svm_classifier.pkl', 'wb') as f:
-        pickle.dump((svm_classifier,X_test,y_test), f)
+    
+    
+    cwd = os.getcwd()  
+    path = os.path.join(cwd,"Hog_svm_classifier.pkl")
+    print("\nPATH",path,"\n")
+
+    with open(path, 'wb') as f:
+        pickle.dump((svm_classifier,X_test,y_test),f)
+   
 
 
     cv.destroyAllWindows()
