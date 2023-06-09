@@ -4,7 +4,7 @@ import cv2 as cv
 import numpy as np
 import sys
 from sklearn import svm
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.metrics import accuracy_score
 
 ##You need to set the following paths to the location of the data on your machine
@@ -85,6 +85,7 @@ def showImageForXms(windowName,image,showForMS):##Display a single image for a s
     if showForMS == 0:
         return
     cv.waitKey(showForMS)
+    
 
 ## MOTION HISTORY IMAGE FUNCTIONS
 def getMHIFromFilePathArray(filePathArray, MIN_DELTA, MAX_DELTA, MHI_DURATION):  
@@ -195,12 +196,38 @@ def test_svm(svm_classifier, X_test, y_test):
     accuracy = accuracy_score(y_test, predictions)
     print("Accuracy:", accuracy)
     print("Done\n")
+    
 
+def cross_validate_svm(features, labels, n_splits=10):
+    # Convert to numpy arrays
+    features = np.array(features)
+    labels = np.array(labels)
+
+    # Reshape features array to 2D if necessary
+    if len(features.shape) == 1:
+        features = features.reshape(-1, 1)
+
+    kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+    accuracy_scores = []
+
+    for train_index, test_index in kfold.split(features, labels):
+        X_train, X_test = features[train_index], features[test_index]
+        y_train, y_test = labels[train_index], labels[test_index]
+
+        svm_classifier = svm.SVC()
+        svm_classifier.fit(X_train, y_train)
+
+        predictions = svm_classifier.predict(X_test)
+        accuracy = accuracy_score(y_test, predictions)
+        accuracy_scores.append(accuracy)
+
+    print(f'Cross-validation accuracy scores: {accuracy_scores}')
+    print(f'Average accuracy: {np.mean(accuracy_scores)}')
 def main():
     labels=(getLabels())
     filePathArray = getFilePaths(PATH_TO_DATA, labels) 
     
-    filePathArray=getSubsetOfData(filePathArray,5)    ## smaller sample for debugging
+    #filePathArray=getSubsetOfData(filePathArray,5)    ## smaller sample for debugging
 
     # Motion History Constant Variables
     Min_Delta = 50  
@@ -211,6 +238,11 @@ def main():
     # Extract HoG features
     print("DONE\n\nExtracting HoG features")
     hog_features, numerical_labels = extract_hog_features(MHI_array)
+    
+    #K-fold cross validation
+    cross_validate_svm(hog_features, numerical_labels)
+    
+    
     
     # Train SVM classifier
     print("DONE\n\nTraining SVM classifier")
