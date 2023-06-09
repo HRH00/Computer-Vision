@@ -1,10 +1,18 @@
+
+
+
 import os
+import pickle
 import cv2 as cv
+from matplotlib import pyplot as plt
 import numpy as np
 import sys
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.cluster import KMeans
+
+
 
 ##You need to set the following paths to the location of the data on your machine
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -86,8 +94,9 @@ def enumerateLabels(labels):#Creates a list of integers which corrolate with the
         print("Labels enumerated:",LabelIntegers,"\n")
         
     return LabelIntegers          
-def getFilePaths(labels, PATH_TO_DATA):#creates a 2D array of paths, the first index corrolates with each label integer
+def getFilePaths(PATH_TO_DATA, labels):#creates a 2D array of paths, the first index corrolates with each label integer
     all_data=[]  
+    
     for label in labels:
         label_data=[]
         label_path = os.path.join(PATH_TO_DATA,label)
@@ -96,20 +105,19 @@ def getFilePaths(labels, PATH_TO_DATA):#creates a 2D array of paths, the first i
             if item_path.endswith(FILE_EXTENTION):
                 label_data.append(item_path)
         print("Found",len(label_data),"Files ending in",FILE_EXTENTION,"for Label,",label)
-        all_data.append(label_data)            
+        all_data.append(label_data)   
 
 
     for data in all_data:
         if not (data):
-            fileError()
-        
-
-                        
+            fileError()                       
        
     if not all_data:
         print("Error: No files found in at least one label directory")
         
     return all_data
+
+    
 def getLabelNameFromInteger(label_int,labels):
     return labels[label_int]
 def getLabelIntFromName(label_name,labels):
@@ -212,19 +220,21 @@ def showImageForXms(windowName,image,showForMS):##Display a single image for a s
 ## MOTION HISTORY IMAGE FUNCTIONS
 def getMHIFromFilePathArray(filePathArray, MIN_DELTA, MAX_DELTA, MHI_DURATION):  
 #generates the motion history from a video file path   
-    print("Getting MHI from file path array")
+    print("\nCalculating Motion History Image from the file path array")
     MHI_array=[]
+    i=0
     for row in filePathArray:
         Label_MHI=[]
+        labels =[]
         for path in row:
             MHI=getMHIFromVideo(path, MIN_DELTA, MAX_DELTA, MHI_DURATION)
             Label_MHI.append(MHI)
             
-            
+
         MHI_array.append(Label_MHI)
-             
-    print("MHI array created")
+    print("Done - MHI array created\n")
     return (MHI_array)
+
 def getMHIFromVideo(video_path, MIN_DELTA, MAX_DELTA, MHI_DURATION):
     # Create a VideoCapture 
     cap = cv.VideoCapture(video_path)
@@ -265,8 +275,17 @@ def getMHIFromVideo(video_path, MIN_DELTA, MAX_DELTA, MHI_DURATION):
     # Release the VideoCapture object
     cap.release()
 
-    # Return the motion history image
-    return (mhi)
+
+    # Normalize to [0,255] and convert type to uint8
+    mhi_uint8 = cv.normalize(mhi, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
+
+    # Apply a colormap if you want to visualize the MHI
+    mhi_colored = cv.applyColorMap(mhi_uint8, cv.COLORMAP_JET)
+
+    # Return the uint8 MHI
+    return mhi_uint8
+
+  
 
 # Sift Functions 
 def SIFTAnalysisOnMHI(mhi):
@@ -277,7 +296,7 @@ def SIFTAnalysisOnMHI(mhi):
     # Draw keypoints 
     mhi_with_keypoints = cv.drawKeypoints(mhi, keypoints, None,flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     # Display keypoints
-    print(len(mhi_with_keypoints))
+    showImageForXms("Keypoints", mhi_with_keypoints, 1)
     return keypoints, descriptors, mhi_with_keypoints
 
 def SIFTAnalysisOnMHI_Array(MHIArray):
@@ -285,26 +304,81 @@ def SIFTAnalysisOnMHI_Array(MHIArray):
     keypoints = [] 
     descriptors = [] 
     keypoints_images = [] 
-    
+
     for label in MHIArray:
-        
         sublist_keypoints = [] 
         sublist_descriptors = [] 
         sublist_keypoints_images = [] 
         for mhi in label:
             keypoint, descriptor, mhi_keypoints_image = SIFTAnalysisOnMHI(mhi)
-            sublist_keypoints.append(keypoint)
-            sublist_descriptors.append(descriptor)
-            sublist_keypoints_images.append(mhi_keypoints_image)
+            if descriptor is not None:
+                sublist_keypoints.append(keypoint)
+                sublist_descriptors.append(descriptor)
+                sublist_keypoints_images.append(mhi_keypoints_image)
 
         keypoints.append(sublist_keypoints)
         descriptors.append(sublist_descriptors)
         keypoints_images.append(sublist_keypoints_images)
     print("Done\n")
-        
+    cv.destroyAllWindows()
     return(keypoints, descriptors, keypoints_images)
-            
-## SVM FUNCTIONS     
+
+def compute_image_features(kmeans, descriptors, k):
+    image_features = []
+    for image_descriptors in descriptors:
+        if image_descriptors is None:
+            image_features.append(np.zeros(k))
+            continue
+        image_descriptors = [descriptor for sublist in image_descriptors for descriptor in sublist]
+        if len(image_descriptors) == 0:
+            image_features.append(np.zeros(k))
+            continue
+        image_descriptors = np.array(image_descriptors)
+        predicted_clusters = kmeans.predict(image_descriptors)
+        histogram, _ = np.histogram(predicted_clusters, bins=range(k+1))
+        normalized_histogram = histogram / len(image_descriptors)
+        image_features.append(normalized_histogram)
+    return np.array(image_features)
+
+def get_hog_features(image):
+    winSize = (64,64)
+    blockSize = (16,16)
+    blockStride = (8,8)
+    cellSize = (8,8)
+    nbins = 9
+    derivAperture = 1
+    winSigma = 4.
+    histogramNormType = 0
+    L2HysThreshold = 2.0000000000000001e-01
+    gammaCorrection = 0
+    nlevels = 64
+    hog = cv.HOGDescriptor(winSize,blockSize,blockStride,cellSize,nbins,derivAperture,winSigma,
+                            histogramNormType,L2HysThreshold,gammaCorrection,nlevels)
+    winStride = (8,8)
+    padding = (8,8)
+    locations = ((10,20),)
+    hist = hog.compute(image,winStride,padding,locations)
+    return hist
+
+
+def extract_hog_features(images):
+    features = []
+    labels = []
+    x=0
+    for lab in images:
+
+        for img in lab:
+    
+            hog_features = get_hog_features(img)
+    #        features.sort(key=lambda x: x.distance)
+            features.append(hog_features)
+            labels.append(x)
+            print("HOG FEATURES", hog_features)
+        x+=1    
+
+    return (features, labels)
+
+#convert face labels into numerical representations
 def train_svm(features, labels):
     # Split data into training and testing subsets
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=0)
@@ -314,61 +388,88 @@ def train_svm(features, labels):
     svm_classifier.fit(X_train, y_train)
 
     return svm_classifier, X_test, y_test
-def test_svm(svm_classifier, X_test, y_test): #Test the SVM classifier
-    
+
+# Step 5: Testing/Evaluation
+def test_svm(svm_classifier, X_test, y_test):
+    print("Testing SVM classifier")
     predictions = svm_classifier.predict(X_test)
     accuracy = accuracy_score(y_test, predictions)
     print("Accuracy:", accuracy)
-   
-   
-   
-   
-   
+    print("Done\n")
+    
+    
+
 def main():
-    debug=True
+
 
     labels=(getLabels())
-    Label_Integers=enumerateLabels(labels) 
-    filePathArray = getFilePaths(labels, PATH_TO_DATA)    
+    label_indexes = [index for index, label in enumerate(labels)]
+    print("Labels: ", label_indexes)
+    filePathArray = getFilePaths(PATH_TO_DATA, labels) 
+    
+    ##smaller sample for testing
+    #filePathArray=getSubsetOfFilePathArray(filePathArray, 20)
 
-    if debug:               
-        # #debuging functions
-        showChannelFromPath(filePathArray[0][0],1)
-        showVideo(filePathArray[0][0])
-        print(getFirstFrame(filePathArray[0][0]).shape)
-        filePathArray=getSubsetOfFilePathArray(filePathArray, 2)
-        pass
-        
-        
-
-
-    ## get a subset of data for testing
     
     #MHI Variables
     Min_Delta = 30  
     Max_Delta  = 100
-    MHI_DURATION= .01
-    MHI_array=getMHIFromFilePathArray(filePathArray,Min_Delta,Max_Delta,MHI_DURATION)
-    keypoints, descriptors, mhi_with_keypoints_images = SIFTAnalysisOnMHI_Array(MHI_array)
+    MHI_DURATION= 5
+    MHI_array=getMHIFromFilePathArray(filePathArray, Min_Delta,Max_Delta, MHI_DURATION)
     
-    if debug:
-        x=0
-        for label in MHI_array:
-            print("Showing Images for:",labels[x])
-            y=0
-            for MHIImg in label:
-                showImageForXms("Original",getFirstFrame(filePathArray[x][y]),0) 
-                showImageForXms("MHI",MHIImg,0)
-                showImageForXms("Keypoints",mhi_with_keypoints_images[x][y],0)
-                showVideo(filePathArray[x][y])
-                y+=1
-            x+=1     
-        
-        
-        
+    
+    print("MHI ARRAY", type(MHI_array[0]))
+    
+    
+    
+    #keypoints, descriptors, mhi_with_keypoints_images = SIFTAnalysisOnMHI_Array(MHI_array)
+    #print("Calculating all_descriptors Variable")   
+    #all_descriptors = np.concatenate([descriptor.flatten() for image_descriptors in descriptors for descriptor in image_descriptors if descriptor is not None], axis=0)
+    #all_descriptors = all_descriptors.reshape(-1, 128)
 
+    # Extract HoG features
+    print("DONE\n\nExtracting HoG features")
+    hog_features, numerical_labels = extract_hog_features(MHI_array)
+    
+    print("Hog Features length  : ", len(hog_features))
+    print("Numerical label length  : ", len(numerical_labels))
 
-#    train_svm(MHI_array, Label_Integers)
+    print("DONE\n\nTraining SVM classifier")
+    # Train SVM classifier
+    svm_classifier, X_test, y_test = train_svm(hog_features, numerical_labels)
+
+    print("DONE\n\nTesting SVM Classifier")
+    # Test SVM classifier
+    test_svm(svm_classifier, X_test, y_test)
+    print(y_test)
+
+    print("DONE\n\nSaving Classifier")
+    # Create the label mapping dictionary
+    
+    
+    
+    label_mapping = {numerical_labels: label for numerical_labels, label in zip(label_indexes, labels)}
+#    # Save the SVM classifier
+#    with open('svm_classifier.pkl', 'wb') as f:
+#        pickle.dump(svm_classifier, f)
+#
+#    # Save the label encoding mapping
+#    with open('label_mapping.pkl', 'wb') as f:
+#        pickle.dump(label_mapping, f)
+#
+    #k = 6
+    #print("Calculating kmeans")   
+    #kmeans = KMeans(n_clusters=k, random_state=0,n_init=10).fit(hog_features)
+    #print("DONE\n")
+    #print("Calculating Image features")
+    #image_features = compute_image_features(kmeans, descriptors, k)
+    #print("DONE\n")
+    #print("training SVM")  
+    #svm_classifier, X_test, y_test = train_svm(image_features, label_indexes)
+    #print("DONE\n")
+    #print("Testing SVM")
+    #test_svm(svm_classifier, X_test, y_test)
+    #print("DONE\n")
     cv.destroyAllWindows()
     print("\nDONE - exiting program")
     
