@@ -270,7 +270,6 @@ def getMHIFromVideo(video_path, MIN_DELTA, MAX_DELTA, MHI_DURATION):
 
 # Sift Functions 
 def SIFTAnalysisOnMHI(mhi):
-    print("SIFT Analysis on MHI")
     sift = cv.SIFT_create()
     # Detect keypoints and compute descriptors
     mhi=cv.convertScaleAbs(mhi)
@@ -282,6 +281,7 @@ def SIFTAnalysisOnMHI(mhi):
     return keypoints, descriptors, mhi_with_keypoints
 
 def SIFTAnalysisOnMHI_Array(MHIArray):
+    print("Sift Analysis on MHI Array")
     keypoints = [] 
     descriptors = [] 
     keypoints_images = [] 
@@ -300,6 +300,8 @@ def SIFTAnalysisOnMHI_Array(MHIArray):
         keypoints.append(sublist_keypoints)
         descriptors.append(sublist_descriptors)
         keypoints_images.append(sublist_keypoints_images)
+    print("Done\n")
+        
     return(keypoints, descriptors, keypoints_images)
             
 ## SVM FUNCTIONS     
@@ -331,11 +333,9 @@ def main():
 
     if debug:               
         # #debuging functions
-        #GreyVideoFrames = getFramesGreyscale(filePathArray[0][0])
-        #showChannelfromVideoFrames(GreyVideoFrames, q0)
-        #showVideo(filePathArray[0][0])
-        #showChannelFromPath(filePathArray[0][0],0)
-        #print(getFirstFrame(filePathArray[0][0]).shape)
+        showChannelFromPath(filePathArray[0][0],1)
+        showVideo(filePathArray[0][0])
+        print(getFirstFrame(filePathArray[0][0]).shape)
         filePathArray=getSubsetOfFilePathArray(filePathArray, 2)
         pass
         
@@ -345,9 +345,9 @@ def main():
     ## get a subset of data for testing
     
     #MHI Variables
-    Min_Delta = 50  
-    Max_Delta  = 1
-    MHI_DURATION= .1
+    Min_Delta = 30  
+    Max_Delta  = 100
+    MHI_DURATION= .01
     MHI_array=getMHIFromFilePathArray(filePathArray,Min_Delta,Max_Delta,MHI_DURATION)
     keypoints, descriptors, mhi_with_keypoints_images = SIFTAnalysisOnMHI_Array(MHI_array)
     
@@ -361,9 +361,6 @@ def main():
                 showImageForXms("MHI",MHIImg,0)
                 showImageForXms("Keypoints",mhi_with_keypoints_images[x][y],0)
                 showVideo(filePathArray[x][y])
-                
-
-
                 y+=1
             x+=1     
         
