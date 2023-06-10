@@ -1,5 +1,4 @@
 import os
-import pickle
 import cv2 as cv
 from package_901476 import Hog as hog
 from package_901476 import Data as data
