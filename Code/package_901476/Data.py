@@ -77,6 +77,14 @@ def showImageForXms(windowName,image,showForMS):##Display a single image for a s
         return
     cv.waitKey(showForMS)
 
+def showImageFromVidForXms(windowName,path,showForMS):##Display a single image for a specified number of milliseconds
+    video = cv.VideoCapture(path)
+    success, image = video.read()
+    if success:
+        cv.imshow(windowName,image)
+        if showForMS == 0:
+            return
+        cv.waitKey(showForMS)
 
 
 def saveData(tupleOfData, path):
@@ -96,5 +104,5 @@ def openSavedData(path):
             return dataTuple
     except Exception as e:
         input("Error opening data from",path,"\n",e,"\n\nPress enter to continue")
-    return None
+        return e
 

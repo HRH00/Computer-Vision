@@ -32,17 +32,6 @@ else
     pip install opencv-contrib-python
     Write-Host "installing numpy"
     pip install numpy
-
-    #run the python scripts
-    Write-Host "Running HOG_and_SVM_classifier_trainer.py with Python" 
-    python Code\\HOG_and_SVM_classifier_trainer.py
-    Write-Host "Running HOG_and_SVM_classifier_tester.py with Python" 
-    python Code\\HOG_and_SVM_classifier_tester.py
-    Write-Host "Running SIFT_and_SVM_classifier_trainer.py with Python" 
-    python Code\\SIFT_and_SVM_classifier_trainer.py
-    Write-Host "Running SIFT_and_SVM_classifier_tester.py with Python" 
-    python Code\\SIFT_and_SVM_classifier_tester.py
-
     write-host "Script Complete"
 
 
