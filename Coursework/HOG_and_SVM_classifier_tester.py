@@ -1,50 +1,9 @@
 import os
-import pickle
-from matplotlib import pyplot as plt
 import numpy as np
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import time
+from package_901476 import test 
+from package_901476 import Data as data
 
-def plot_confusion_matrix(confusion_matrix, labels,title):
-    plt.imshow(confusion_matrix, cmap='Purples')
-    plt.colorbar()
-
-    num_labels = len(labels)
-    labelsX = [string[:7] for string in labels]#shorten labels to 7 characters
-    print(labelsX)
-    plt.xticks(np.arange(num_labels), labelsX)
-    plt.yticks(np.arange(num_labels), labels)
-
-    # Add labels to each cell
-    for i in range(num_labels):
-        for j in range(num_labels):
-            plt.text(j, i, confusion_matrix[i, j], ha='center', va='center', color='black')
-
-    plt.xlabel('Predicted label')
-    plt.ylabel('True label')
-    plt.title(title)
-    plt.show()
-
-##time bench marks a function 50 times
-def benchmark(func):
-    def wrapper(*args, **kwargs):
-        average = 0
-        N=50
-        for i in range(N):    
-            start_time = time.time()
-            result = func(*args, **kwargs)
-            end_time = time.time()
-            execution_time = (end_time - start_time) * 1000  # Convert to milliseconds
-            #print(f"Run {i} of {N} - Execution time: {execution_time:.2f} ms")
-            average+=execution_time
-        average=average/N
-        print(f"Average execution time: {average:.2f} ms")
-        return result
-    return wrapper
-@benchmark
-def pred(classifier, image):
-    classifier.predict(image)
-           
 def main():
     print("Testing HOG and SVM Classifier")
     # Test SVM classifier
@@ -57,10 +16,9 @@ def main():
         path = os.path.join(cwd,"Hog_svm_classifier.pkl")
         print("\n",path,"\n")
 
-        with open(path, 'rb') as f:
-            (svm_classifier,X_test,y_test, labels,SVM_cross_validate) = pickle.load(f)##open cached data
-            
-    
+        dataTuple = data.openSavedData(path)
+        (svm_classifier,X_test,y_test, labels,SVM_cross_validate) = dataTuple   
+
 
         
         print("Testing Standard SVM classifier")
@@ -69,7 +27,7 @@ def main():
         print("Accuracy Score:", accuracy)
         
         print("Classify one image") 
-        pred(svm_classifier,[X_test[0]]) 
+        test.pred(svm_classifier,[X_test[0]]) 
 
         cm = confusion_matrix(y_test, predictions)
         print("Confusion Matrix:")
@@ -77,9 +35,9 @@ def main():
         print(cm)
         # Precision, recall, f-score 
         print(classification_report(y_test, predictions))
-        title="Consufion Matrix for HOG and SVM Classifier"
+        title="Confusion Matrix for HOG and SVM Classifier"
         
-        plot_confusion_matrix(cm,labels,title)
+        test.plot_confusion_matrix(cm,labels,title)
         print("Done\n")
         
         #####Cross validation analysis
@@ -88,16 +46,15 @@ def main():
         print("Confusion Matrix Cross Validation:")
         
         print(agg_cm_CV)
-        title="Aggregate Consufion Matrix for HOG and SVM Classifier with Cross Validation"
-        plot_confusion_matrix(agg_cm_CV,labels,title)
+        title="Aggregate Consufion Matrix - HOG+SVM Classifier with Cross Validation"
+        test.plot_confusion_matrix(agg_cm_CV,labels,title)
         print("\nTesting SVM classifier with Cross Validation")
         print(f'SVM Cross Validation Average accuracy : {np.mean(acc_scores_cval)}')
         
 
     except: # ERROR
-        print("Cannot load Classifier - run HOG_and_SVM_classifier_trainer.py first")
-    
-    input("Press Enter to Exit...")
+        print("ERROR - run HOG_and_SVM_classifier_trainer.py in same directory as this file first")
+        print("If this doesn\'t work, then something has gone very wrong")
     print("\nDONE - exiting program")
     
 if __name__=="__main__":

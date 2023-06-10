@@ -4,14 +4,13 @@
 import os
 import pickle
 import cv2 as cv
-from matplotlib import pyplot as plt
 import numpy as np
-import sys
 from sklearn import svm
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 from sklearn.cluster import KMeans
 
+from package_901476 import Data as data
+from package_901476 import MotionHistory as mh
 
 
 ##You need to set the following paths to the location of the data on your machine
@@ -21,221 +20,6 @@ PATH_TO_DATA = os.path.join(dir_path,"Datastore","Supplied")
 PATH_TO_MHI_STORAGE = os.path.join("q") #iqqn ot in use
 FILE_EXTENTION = ".avi" 
 
-##DEBUGGING FUNCTIONS
-
-def showChannelFromPath(video_path, channel_index):
-    print("showing Channel",channel_index,"from path",video_path)
-    
-    # Open the video file
-    cap = cv.VideoCapture(video_path)
-
-    # Check if the video file was successfully opened
-    if not cap.isOpened():
-        print(" opening video file", video_path)
-        return
-    showShape=True
-    while True:
-        success, frame = cap.read()
-        if success: 
-            # Split the frame into color channels
-            channels = cv.split(frame)
-
-            # Extract the specified channel based on the index
-            channel = channels[channel_index]
-
-            if showShape:
-                    print("Showchannelfrompath - Channel Shape",channel.shape)
-                    showShape=False
-            
-            # Display the channel
-            cv.imshow("Channel", channel)
-
-            # Check for 'q' key press to quit
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
-        else:
-            print("releasing video")
-            cap.release()
-            cv.destroyAllWindows()
-            break
-def getSubsetOfFilePathArray(filePathArray, samplesPerFeature):
-    subsetData=[]
-    for feature in filePathArray:
-        featureList=[]
-        for video in feature[:samplesPerFeature]:
-            featureList.append(video)
-        subsetData.append(featureList)    
-        
-    return subsetData  
-
-
-###File Gathering init Function
-def getLabels():# Creates a list of labels, sourced from each child directory names in the specified path 
-
-    directories = []
-    try:
-        for item in os.listdir(PATH_TO_DATA):
-            item_path = os.path.join(PATH_TO_DATA, item)
-            if os.path.isdir(item_path):
-                directories.append(item)                
-    except Exception as e:
-        print(", No data found\n\n",e)
-    else:
-        print("Labels:", directories)
-    return directories
-def enumerateLabels(labels):#Creates a list of integers which corrolate with the labels list, 
-
-    
-    LabelIntegers = [i for i in range(len(labels))] # list aprehention
-
-    if LabelIntegers== []:
-        print("CANNOT ENumerate, no labels found\n\n")    
-    else:
-        print("Labels enumerated:",LabelIntegers,"\n")
-        
-    return LabelIntegers          
-def getFilePaths(PATH_TO_DATA, labels):#creates a 2D array of paths, the first index corrolates with each label integer
-    all_data=[]  
-    
-    for label in labels:
-        label_data=[]
-        label_path = os.path.join(PATH_TO_DATA,label)
-        for item in os.listdir(label_path):
-            item_path = os.path.join(label_path, item)    
-            if item_path.endswith(FILE_EXTENTION):
-                label_data.append(item_path)
-        print("Found",len(label_data),"Files ending in",FILE_EXTENTION,"for Label,",label)
-        all_data.append(label_data)   
-
-
-    for data in all_data:
-        if not (data):
-            fileError()                       
-       
-    if not all_data:
-        print("Error: No files found in at least one label directory")
-        
-    return all_data
-
-    
-def getLabelNameFromInteger(label_int,labels):
-    return labels[label_int]
-def getLabelIntFromName(label_name,labels):
-    return labels.index(label_name)
-def fileError():
-    print("\033[91mBad file path, no data found\n")
-    print(PATH_TO_DATA,"\nContains no .avi, has directory with no .avi or has wrong file structure\033[0m")
-    print("\033[91mupdate PATH_TO_DATA with correct path\033[0m")
-    sys.exit()
-###def getFramesGreyscale(video_path):
-
-    # Open the video file
-    
-    cap = cv.VideoCapture(video_path)
-    frames=[]
-
-    # Check if the video file was successfully opened
-    if not cap.isOpened():
-        print(" opening video file",video_path)
-        return   
-
-    while True:
-        success, frame = cap.read()
-        if not success:
-            break
-        frame = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
-        frames.append(frame)     
-
-    cap.release()
-
-    print("Frames extracted from ",video_path)
-    
-    return frames
-def getFirstFrame(video_path):
-    # Open the video file
-    cap = cv.VideoCapture(video_path)
-
-    # Check if the video file was successfully opened
-    if not cap.isOpened():
-        print(" opening video file",video_path)
-        return   
-
-    success, frame = cap.read()
-    if success:
-        return frame     
-    else:
-        print("Can not find a frame")   
-        return None
-
-    cap.release()
-
-### Output Graphics Functions
-def showChannelfromVideoFrames(video, channel_index):
-    print("showing Channel",channel_index,"from video frames")
-    for frame in video:
-        # Split the frame into color channels
-        channels = cv.split(frame)
-
-        # Extract the specified channel based on the index
-        channel = channels[channel_index]
-        Windowsname="Channel"+str(channel_index)
-        # Display the channel
-        cv.imshow(Windowsname, channel)
-
-        # Check for 'q' key press to quit
-        if cv.waitKey(10) & 0xFF == ord('q'):
-            break
-
-    cv.destroyAllWindows()
-def showVideo(videopath):
-    video = cv.VideoCapture(videopath)
-    while True:
-        success, frame = video.read()
-        if success:
-                # Extract the specified channel based on the index
-            Windowsname="Video"
-            # Display the channel
-            cv.imshow(Windowsname,frame)
-
-            # Check for 'q' key press to quit
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
-        else:
-            video.release()
-            cv.destroyAllWindows()
-            break
-def showImageUntilKeyPress(windowName,image):
-    while True:
-        cv.imshow(windowName,image)
-
-        # Check for 'q' key press to quit
-        if cv.waitKey(1) & 0xFF == ord('q'):
-            break
-def showImageForXms(windowName,image,showForMS):##Display a single image for a specified number of milliseconds
-    cv.imshow(windowName,image)
-    if showForMS == 0:
-        return
-    cv.waitKey(showForMS)
-
-## MOTION HISTORY IMAGE FUNCTIONS
-def getMHIFromFilePathArray(filePathArray, MIN_DELTA, MAX_DELTA, MHI_DURATION):  
-#generates the motion history from a video file path   
-    print("\nCalculating Motion History Image from the file path array")
-    MHI_array=[]
-    i=0
-    for row in filePathArray:
-        Label_MHI=[]
-        labels =[]
-        for path in row:
-            MHI=getMHIFromVideo(path, MIN_DELTA, MAX_DELTA, MHI_DURATION)
-            Label_MHI.append(MHI)
-            
-
-        MHI_array.append(Label_MHI)
-    print("Done - MHI array created\n")
-    return (MHI_array)
-
-  
 
 # Sift Functions 
 def SIFTAnalysisOnMHI(mhi):
@@ -293,12 +77,10 @@ def compute_image_features(kmeans, descriptors, k):
 
 
 def main():
-
-
-    labels=(getLabels())
+    labels=(data.getLabels(PATH_TO_DATA))
     label_indexes = [index for index, label in enumerate(labels)]
     print("Labels: ", label_indexes)
-    filePathArray = getFilePaths(PATH_TO_DATA, labels) 
+    filePathArray = data.getFilePaths(PATH_TO_DATA, labels) 
     
     ##smaller sample for testing
     #filePathArray=getSubsetOfFilePathArray(filePathArray, 20)
