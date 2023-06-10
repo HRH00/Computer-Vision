@@ -6,7 +6,7 @@ import numpy as np
 import sys
 from sklearn import svm
 from sklearn.model_selection import StratifiedKFold, train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
 
 ##You need to set the following paths to the location of the data on your machine
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -197,10 +197,11 @@ def test_svm(svm_classifier, X_test, y_test):
     accuracy = accuracy_score(y_test, predictions)
     print("Accuracy:", accuracy)
     print("Done\n")
-    
+    from sklearn.metrics import confusion_matrix
 
 def cross_validate_svm(features, labels, n_splits=10):
-    # Convert to numpy arrays
+    print("Performing cross-validation on SVM classifier")
+    # Convert to np arrays
     features = np.array(features)
     labels = np.array(labels)
 
@@ -209,21 +210,36 @@ def cross_validate_svm(features, labels, n_splits=10):
         features = features.reshape(-1, 1)
 
     kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
-    accuracy_scores = []
-
+    acc_scores_cval = []
+    
+    unique_labels = np.unique(labels)
+    num_labels = len(unique_labels)
+    
+    # Initialize an empty confusion matrix with the correct shape
+    confusion_matrix_agg = np.zeros((num_labels, num_labels))
+    
+    fold_index = 0
     for train_index, test_index in kfold.split(features, labels):
-        X_train, X_test = features[train_index], features[test_index]
-        y_train, y_test = labels[train_index], labels[test_index]
+        X_train_cval, x_test_cval = features[train_index], features[test_index]
+        y_train_cval, y_test_cval = labels[train_index], labels[test_index]
 
-        svm_classifier = svm.SVC()
-        svm_classifier.fit(X_train, y_train)
+        svm_classifier_cval = svm.SVC()
+        svm_classifier_cval.fit(X_train_cval, y_train_cval)
 
-        predictions = svm_classifier.predict(X_test)
-        accuracy = accuracy_score(y_test, predictions)
-        accuracy_scores.append(accuracy)
+        predictions = svm_classifier_cval.predict(x_test_cval)
+        accuracy = accuracy_score(y_test_cval, predictions)
+        acc_scores_cval.append(accuracy)
 
-    print(f'Cross-validation accuracy scores: {accuracy_scores}')
-    print(f'Average accuracy: {np.mean(accuracy_scores)}')
+        # Calculate the confusion matrix for the current fold
+        fold_confusion_matrix = confusion_matrix(y_test_cval, predictions)
+
+        # Aggregate the confusion matrices
+        confusion_matrix_agg += fold_confusion_matrix    
+        fold_index += 1
+    
+    print("Done\n")
+    return acc_scores_cval, acc_scores_cval, confusion_matrix_agg
+
     
 def main():
     labels=(getLabels())
@@ -242,15 +258,15 @@ def main():
     hog_features, numerical_labels = extract_hog_features(MHI_array)
     
     #K-fold cross validation
-    cross_validate_svm(hog_features, numerical_labels)
     
+    SVM_cross_validate = cross_validate_svm(hog_features, numerical_labels)
     
     
     # Train SVM classifier
     print("DONE\n\nTraining SVM classifier")
     svm_classifier, X_test, y_test = train_svm(hog_features, numerical_labels)
 
-    # Save the SVM classifier
+    # Save the SVM classifiers
     
     print("DONE\n\nSaving Classifier")
     
@@ -260,7 +276,7 @@ def main():
     print("\nPATH",path,"\n")
 
     with open(path, 'wb') as f:
-        pickle.dump((svm_classifier,X_test,y_test,labels),f)
+        pickle.dump((svm_classifier,X_test,y_test,labels,SVM_cross_validate),f)
    
 
 

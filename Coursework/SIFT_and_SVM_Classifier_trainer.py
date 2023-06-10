@@ -235,56 +235,6 @@ def getMHIFromFilePathArray(filePathArray, MIN_DELTA, MAX_DELTA, MHI_DURATION):
     print("Done - MHI array created\n")
     return (MHI_array)
 
-def getMHIFromVideo(video_path, MIN_DELTA, MAX_DELTA, MHI_DURATION):
-    # Create a VideoCapture 
-    cap = cv.VideoCapture(video_path)
-
-    # Get frame 1 of video
-    ret, frame = cap.read()
-
-    # Convert to grayscale
-    prev_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-
-    # Init mhi motion history image
-    h, w = prev_frame.shape[:2]
-    mhi = np.zeros((h, w), np.float32)
-
-    while True:
-        # Read the next frame
-        ret, frame = cap.read()
-
-        if not ret:
-            break
-
-        # Convert the frame to grayscale
-        curr_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-
-        # Compute asd difference
-        frame_diff = cv.absdiff(curr_frame, prev_frame)
-
-        # binary motion image
-        _, motion_mask = cv.threshold(frame_diff, MIN_DELTA, MAX_DELTA, cv.THRESH_BINARY)
-
-        # Update the motion history image
-        timestamp = cv.getTickCount() / cv.getTickFrequency()
-        cv.motempl.updateMotionHistory(motion_mask, mhi, timestamp, MHI_DURATION)
-
-        # Update the previous frame
-        prev_frame = curr_frame
-
-    # Release the VideoCapture object
-    cap.release()
-
-
-    # Normalize to [0,255] and convert type to uint8
-    mhi_uint8 = cv.normalize(mhi, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
-
-    # Apply a colormap if you want to visualize the MHI
-    mhi_colored = cv.applyColorMap(mhi_uint8, cv.COLORMAP_JET)
-
-    # Return the uint8 MHI
-    return mhi_uint8
-
   
 
 # Sift Functions 
@@ -341,25 +291,6 @@ def compute_image_features(kmeans, descriptors, k):
     return np.array(image_features)
 
 
-#convert face labels into numerical representations
-def train_svm(features, labels): 
-    # Split data into training and testing subsets
-    X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=0)
-    # Train SVM classifier
-    svm_classifier = svm.SVC()
-    svm_classifier.fit(X_train, y_train)
-
-    return svm_classifier, X_test, y_test
-
-# Step 5: Testing/Evaluation
-def test_svm(svm_classifier, X_test, y_test):
-    print("Testing SVM classifier")
-    predictions = svm_classifier.predict(X_test)
-    accuracy = accuracy_score(y_test, predictions)
-    print("Accuracy:", accuracy)
-    print("Done\n")
-    
-    
 
 def main():
 

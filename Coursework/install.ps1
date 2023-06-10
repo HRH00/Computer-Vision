@@ -4,10 +4,8 @@ $p = &{python -V} 2>&1
 if($p -is [System.Management.Automation.ErrorRecord])
 {
     Write-Host "Install python 3.11" 
-
     # grab the version string from the error message
     $p.Exception.Message
-
 	Write-Host "Press any key to continue..."
 	$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
@@ -19,8 +17,7 @@ else
     python get-pip.py
     python -m pip install --upgrade pip
     pip install -U scikit-learn
-    pip install 
+    pip install -U matplotlib
     pip install opencv-contrib-python
     pip install numpy
-
 }

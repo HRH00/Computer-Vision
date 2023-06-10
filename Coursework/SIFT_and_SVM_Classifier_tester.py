@@ -25,7 +25,7 @@ def plot_confusion_matrix(confusion_matrix, labels,title):
     plt.title(title)
     plt.show()
 
-##time bench marks a function 50 times
+##time bench marks a function 50 times and prints the average time
 def benchmark(func):
     def wrapper(*args, **kwargs):
         average = 0
@@ -46,7 +46,7 @@ def pred(classifier, image):
     classifier.predict(image)
            
 def main():
-    print("Testing HOG and SVM Classifier")
+    print("Testing SIFT and SVM Classifier")
     # Test SVM classifier
     # Open the SVM classifier and test data unseen by the classifier``
 
@@ -54,7 +54,7 @@ def main():
     
     try:
         cwd = os.getcwd()  
-        path = os.path.join(cwd,"Hog_svm_classifier.pkl")
+        path = os.path.join(cwd,"SIFT_svm_classifier.pkl")
         print("\n",path,"\n")
 
         with open(path, 'rb') as f:
@@ -77,25 +77,36 @@ def main():
         print(cm)
         # Precision, recall, f-score 
         print(classification_report(y_test, predictions))
-        title="Consufion Matrix for HOG and SVM Classifier"
+        title="Consufion Matrix for SIFT and SVM Classifier"
         
         plot_confusion_matrix(cm,labels,title)
         print("Done\n")
         
         #####Cross validation analysis
         
-        (acc_scores_cval, acc_scores_cval,agg_cm_CV) = SVM_cross_validate
+        (acc_scores_cval, svm_classifier_cval, x_test_cval, y_test_cval) = SVM_cross_validate
+        input("Press Enter to view cross validation results...")
+        predictions_CV = svm_classifier_cval.predict(x_test_cval)
+        accuracy_CV = accuracy_score(y_test_cval, predictions_CV)
+        print("Cross validation Accuracy Score:", accuracy_CV)
+        
+        print("Classify one image") 
+        pred(svm_classifier_cval,[X_test[0]]) 
+
+        cm_CV = confusion_matrix(y_test_cval, predictions_CV)
         print("Confusion Matrix Cross Validation:")
         
-        print(agg_cm_CV)
-        title="Aggregate Consufion Matrix for HOG and SVM Classifier with Cross Validation"
-        plot_confusion_matrix(agg_cm_CV,labels,title)
+        print(cm_CV)
+        # Precision, recall, f-score 
+        print(classification_report(y_test_cval, predictions_CV))
+        title="Consufion Matrix for SIFT and SVM Classifier with Cross Validation"
+        plot_confusion_matrix(cm_CV,labels,title)
         print("\nTesting SVM classifier with Cross Validation")
         print(f'SVM Cross Validation Average accuracy : {np.mean(acc_scores_cval)}')
         
 
     except: # ERROR
-        print("Cannot load Classifier - run HOG_and_SVM_classifier_trainer.py first")
+        print("Cannot load Classifier - run SIFT_and_SVM_classifier_trainer.py first")
     
     input("Press Enter to Exit...")
     print("\nDONE - exiting program")
