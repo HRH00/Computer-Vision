@@ -1,5 +1,5 @@
 import os
-import cv2 as cv
+
 from package_901476 import Hog as hog
 from package_901476 import Data as data
 from package_901476 import Motion_History as mhi
@@ -52,7 +52,6 @@ def main():
    
     data.saveData(dataTuple,path)
 
-    cv.destroyAllWindows()
     print("\nDONE - exiting program")
     
 if __name__=="__main__":

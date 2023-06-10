@@ -13,7 +13,8 @@ def getFilePaths(PATH_TO_DATA, labels,FILE_EXTENTION):#creates a 2D array of pat
         for item in os.listdir(label_path):
             item_path = os.path.join(label_path, item)    
             if item_path.endswith(FILE_EXTENTION):
-                label_data.append(item_path)
+                if avi_not_corrupt(item_path):
+                    label_data.append(item_path)
         print("Found",len(label_data),"Files ending in",FILE_EXTENTION,"for Label,",label)
         all_data.append(label_data)   
 
@@ -21,11 +22,17 @@ def getFilePaths(PATH_TO_DATA, labels,FILE_EXTENTION):#creates a 2D array of pat
     for data in all_data:
         if not (data):
             fileError()                       
-       
     if not all_data:
         print("Error: No files found in at least one label directory")
-        
     return all_data
+       
+def avi_not_corrupt(file_path):
+    if cv.VideoCapture(file_path).isOpened():
+       return True  
+    else:
+        print("Error in", file_path)
+        return False         
+
 def getLabels(PATH_TO_DATA):# Creates a list of labels, sourced from each child directory names in the specified path 
     print("Getting Labels")
     directories = []
@@ -39,6 +46,7 @@ def getLabels(PATH_TO_DATA):# Creates a list of labels, sourced from each child 
     else:
         print("Labels:", directories)
     return directories
+
 def enumerateLabels(labels):#Creates a list of integers which corrolate with the labels list, 
     print("Enumerating Labels")
     LabelIntegers = [i for i in range(len(labels))] # list aprehention
@@ -69,7 +77,6 @@ def fileError(PATH_TO_DATA):
     print("\033[91mupdate PATH_TO_DATA with correct path\033[0m")
     os.sys.exit()
 
-
 def showImageForXms(windowName,image,showForMS):##Display a single image for a specified number of milliseconds
 
     cv.imshow(windowName,image)
@@ -86,14 +93,13 @@ def showImageFromVidForXms(windowName,path,showForMS):##Display a single image f
             return
         cv.waitKey(showForMS)
 
-
 def saveData(tupleOfData, path):
     print("Saving data to",path)
     try:
         with open(path, 'wb') as f:
             pickle.dump((tupleOfData),f)
     except Exception as e:
-        input("Error saving data to",path,"\n",e,"\n\nPress enter to continue")
+        print("Error saving data to",path)
         return
 
 def openSavedData(path):
@@ -102,7 +108,7 @@ def openSavedData(path):
         with open(path, 'rb') as f: 
             dataTuple = pickle.load(f)
             return dataTuple
-    except Exception as e:
-        input("Error opening data from",path,"\n",e,"\n\nPress enter to continue")
-        return e
+    except Exception:
+        print("Error opening data from",path)
+        return False 
 

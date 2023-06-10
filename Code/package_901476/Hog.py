@@ -1,7 +1,7 @@
 import cv2 as cv
 
-def get_hog_features(image): # returns a histogram of gradients for a given image
-    winSize = (64,64) # HOG parameters
+def get_hog_features(image): 
+    winSize = (64,64)
     blockSize = (16,16)
     blockStride = (8,8)
     cellSize = (8,8)
@@ -26,9 +26,7 @@ def extract_hog_features(images):
     labels = []
     x=0
     for lab in images:
-
         for img in lab:
-    
             hog_features = get_hog_features(img)
     
     #        features.sort(key=lambda x: x.distance)

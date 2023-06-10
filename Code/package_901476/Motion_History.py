@@ -1,24 +1,28 @@
-
 ## MOTION HISTORY IMAGE FUNCTIONS
+import package_901476.Data as Data
 import cv2 as cv
 import numpy as np
-import package_901476.Data as Data
 
 def getMHIFromFilePathArray(filePathArray, MIN_DELTA, MAX_DELTA, MHI_DURATION):  
 #generates the motion history from a video file path   
-    print("Calculating Motion History Image from the file path array\nTHIS MAY TAKE A WHILE\n")
-    MHI_array=[]
-    for row in filePathArray:
-        Label_MHI=[]
-        for path in row:
-            MHI=getMHIFromVideo(path, MIN_DELTA, MAX_DELTA, MHI_DURATION)
-            Data.showImageForXms("MHI",MHI,1)
-            Data.showImageFromVidForXms("Frame",path,1)
-            Label_MHI.append(MHI)
-        MHI_array.append(Label_MHI)
-    print("\nDone - MHI array created\n")
-    cv.destroyAllWindows()
-    return (MHI_array)
+    has_data = Data.openSavedData("MHI_array.pkl")
+    if has_data:
+        return has_data
+    else:
+        print("Calculating Motion History Image from the file path array\nTHIS MAY TAKE A WHILE\n")
+        MHI_array=[]
+        for row in filePathArray:
+            Label_MHI=[]
+            for path in row:
+                MHI=getMHIFromVideo(path, MIN_DELTA, MAX_DELTA, MHI_DURATION)
+                Data.showImageForXms("MHI",MHI,1)
+                Data.showImageFromVidForXms("Frame",path,1)
+                Label_MHI.append(MHI)
+            MHI_array.append(Label_MHI)
+        print("\nDone - MHI array created\n")
+        cv.destroyAllWindows()
+        Data.saveData(MHI_array,"MHI_array.pkl")
+        return (MHI_array)
 
 def getMHIFromVideo(video_path, MIN_DELTA, MAX_DELTA, MHI_DURATION):
     # Create a VideoCapture object and read from input file

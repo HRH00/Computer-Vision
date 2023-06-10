@@ -36,8 +36,7 @@ def cross_validate_svm(features, labels, n_splits=10):
     kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
     acc_scores_cval = []
     
-    unique_labels = np.unique(labels)
-    num_labels = len(unique_labels)
+    num_labels = len(labels)
     
     # Initialize an empty confusion matrix with the correct shape
     confusion_matrix_agg = np.zeros((num_labels, num_labels))
