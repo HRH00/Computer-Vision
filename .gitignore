@@ -7,5 +7,6 @@
 shape_predictor_68_face_landmarks.dat
 *.caffemodel
 *.prototxt.txt
-
+*/Datastore/Supplied_Data
+*/Datastore/External_Data
 *.npz
