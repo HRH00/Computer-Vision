@@ -16,8 +16,8 @@ else
     # otherwise return as is
     $p
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-    python -m pip install --upgrade pip
     python get-pip.py
+    python -m pip install --upgrade pip
     pip install -U scikit-learn
     pip install 
     pip install opencv-contrib-python

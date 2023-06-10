@@ -6,7 +6,7 @@ directories which are not a part of the data set in /Datastore/Supplied_Data
 
 The version of python needed to run this code is 3.11, the program has only been tested on a windows 11 machine.
 
-Open CV and Dlib binarys must be installed on the system, in addition to the python packages imported in each file:
+The python packages imported in each file must be installed:
 pip install sklearn
 pip install 
 pip install opencv-contrib-python
@@ -14,4 +14,4 @@ pip install numpy
 
 
 
-os, pickle, sys should already be preinstalled in the python libraries. 
+os, pickle, sys, time modules should already be preinstalled in the python libraries. 

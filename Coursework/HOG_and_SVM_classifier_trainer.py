@@ -1,5 +1,6 @@
 import os
 import pickle
+import time
 import cv2 as cv
 import numpy as np
 import sys
@@ -15,7 +16,7 @@ PATH_TO_DATA = os.path.join(dir_path,"Datastore","Supplied_Data")  #set each str
 # i.e directory name = 'Running'
 
 FILE_EXTENTION = ".avi" 
-
+###
 ###File Gathering init Function
 def getLabels():# Creates a list of labels, sourced from each child directory names in the specified path 
 
@@ -259,7 +260,7 @@ def main():
     print("\nPATH",path,"\n")
 
     with open(path, 'wb') as f:
-        pickle.dump((svm_classifier,X_test,y_test),f)
+        pickle.dump((svm_classifier,X_test,y_test,labels),f)
    
 
 
