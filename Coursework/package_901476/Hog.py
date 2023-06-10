@@ -21,6 +21,7 @@ def get_hog_features(image): # returns a histogram of gradients for a given imag
     return hist
 
 def extract_hog_features(images):
+    print("Extracting HoG features")
     features = []
     labels = []
     x=0
@@ -29,10 +30,10 @@ def extract_hog_features(images):
         for img in lab:
     
             hog_features = get_hog_features(img)
+    
     #        features.sort(key=lambda x: x.distance)
             features.append(hog_features)
             labels.append(x)
-            print("HOG FEATURES", hog_features)
         x+=1    
 
     return (features, labels)

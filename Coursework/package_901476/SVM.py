@@ -4,6 +4,7 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 import numpy as np
 
 def train_svm(features, labels):
+    print("Training SVM classifier")
     # Split data into training and testing subsets
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=0)
 
@@ -14,6 +15,7 @@ def train_svm(features, labels):
     return svm_classifier, X_test, y_test
 
 def test_svm(svm_classifier, X_test, y_test):
+    print
     print("Testing SVM classifier")
     predictions = svm_classifier.predict(X_test)
     accuracy = accuracy_score(y_test, predictions)

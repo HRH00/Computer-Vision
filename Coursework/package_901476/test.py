@@ -3,6 +3,7 @@ import time
 import numpy as np
 
 def plot_confusion_matrix(confusion_matrix, labels,title):
+    print("Plotting confusion matrix")
     plt.imshow(confusion_matrix, cmap='Purples')
     plt.colorbar()
 

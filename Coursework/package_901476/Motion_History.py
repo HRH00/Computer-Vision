@@ -6,7 +6,7 @@ import numpy as np
 
 def getMHIFromFilePathArray(filePathArray, MIN_DELTA, MAX_DELTA, MHI_DURATION):  
 #generates the motion history from a video file path   
-    print("\nCalculating Motion History Image from the file path array")
+    print("Calculating Motion History Image from the file path array")
     MHI_array=[]
     i=0
     for row in filePathArray:
@@ -18,7 +18,7 @@ def getMHIFromFilePathArray(filePathArray, MIN_DELTA, MAX_DELTA, MHI_DURATION):
             
 
         MHI_array.append(Label_MHI)
-    print("Done - MHI array created\n")
+    print("\nDone - MHI array created\n")
     return (MHI_array)
 
 def getMHIFromVideo(video_path, MIN_DELTA, MAX_DELTA, MHI_DURATION):

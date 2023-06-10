@@ -4,6 +4,7 @@ import cv2 as cv
 import pickle
 
 def getFilePaths(PATH_TO_DATA, labels,FILE_EXTENTION):#creates a 2D array of paths, the first index corrolates with each label integer
+    print("Getting File Paths")
     all_data=[]  
     
     for label in labels:
@@ -26,7 +27,7 @@ def getFilePaths(PATH_TO_DATA, labels,FILE_EXTENTION):#creates a 2D array of pat
         
     return all_data
 def getLabels(PATH_TO_DATA):# Creates a list of labels, sourced from each child directory names in the specified path 
-
+    print("Getting Labels")
     directories = []
     try:
         for item in os.listdir(PATH_TO_DATA):
@@ -39,6 +40,7 @@ def getLabels(PATH_TO_DATA):# Creates a list of labels, sourced from each child 
         print("Labels:", directories)
     return directories
 def enumerateLabels(labels):#Creates a list of integers which corrolate with the labels list, 
+    print("Enumerating Labels")
     LabelIntegers = [i for i in range(len(labels))] # list aprehention
 
     if LabelIntegers== []:
@@ -50,6 +52,7 @@ def enumerateLabels(labels):#Creates a list of integers which corrolate with the
 
 ##DEBUGGING FUNCTION - subset of data
 def getSubsetOfData(filePathArray, samplesPerFeature):
+    print("Getting subset of data")
     subsetData=[]
     for feature in filePathArray:
         featureList=[]
@@ -68,6 +71,7 @@ def fileError(PATH_TO_DATA):
 
 
 def showImageForXms(windowName,image,showForMS):##Display a single image for a specified number of milliseconds
+
     cv.imshow(windowName,image)
     if showForMS == 0:
         return
@@ -76,11 +80,13 @@ def showImageForXms(windowName,image,showForMS):##Display a single image for a s
 
 
 def saveData(tupleOfData, path):
+    print("Saving data to",path)
     with open(path, 'wb') as f:
         pickle.dump((tupleOfData),f)
 
 
 def openSavedData(path):
+    print("Opening data from",path)
     with open(path, 'rb') as f:
         dataTuple = pickle.load(f)
     return dataTuple
