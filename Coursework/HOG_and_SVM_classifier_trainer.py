@@ -223,6 +223,7 @@ def cross_validate_svm(features, labels, n_splits=10):
 
     print(f'Cross-validation accuracy scores: {accuracy_scores}')
     print(f'Average accuracy: {np.mean(accuracy_scores)}')
+    
 def main():
     labels=(getLabels())
     filePathArray = getFilePaths(PATH_TO_DATA, labels) 

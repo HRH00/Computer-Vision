@@ -1,6 +1,6 @@
 import os
 import pickle
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.model_selection import cross_val_score, KFold
 from sklearn.datasets import load_iris
 from sklearn.ensemble import RandomForestClassifier
@@ -29,24 +29,12 @@ def main():
         print("Accuracy Score:", accuracy)
         
 
-        # Load data
-        iris = load_iris()
-        X = iris.data
-        y = iris.target
-
-        # Define the model
-        model = RandomForestClassifier()
-
-        # Define the cross-validation procedure
-        cv = KFold(n_splits=10, random_state=1, shuffle=True)
-
-        # Evaluate model
-        scores = cross_val_score(model, X, y, scoring='accuracy', cv=cv, n_jobs=-1)
-
-        # Report performance
-        print('Accuracy: %.3f (%.3f)' % (scores.mean(), scores.std()))
-
+        cm = confusion_matrix(y_test, predictions)
+        print("Confusion Matrix:")
         
+        print(cm)
+        # Precision, recall, f-score 
+        print(classification_report(y_test, predictions))
         print("Done\n")
 
     except: # ERROR
