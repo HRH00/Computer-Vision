@@ -11,7 +11,7 @@ def train_neural_network(features_input, y_train):
     print("Training Neural Network classifier")
     # Convert features and labels to numpy arrays
     X_train, X_test, y_train, y_test = train_test_split(features_input, y_train, test_size=0.2, random_state=0)
-    
+
     X_train = np.array(X_train)
     y_train = np.array(y_train)
     X_test = np.array(X_test)
@@ -46,13 +46,13 @@ def cross_validate_nn(features, labels, n_splits=10):
 
     kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
     acc_scores_cval = []
-    
+
     unique_labels = np.unique(labels)
     num_labels = len(unique_labels)
-    
+
     # Initialize an empty confusion matrix with the correct shape
     confusion_matrix_agg = np.zeros((num_labels, num_labels))
-    
+
     fold_index = 0
     for train_index, test_index in kfold.split(features, labels):
         X_train_cval, X_test_cval = features[train_index], features[test_index]
@@ -80,6 +80,6 @@ def cross_validate_nn(features, labels, n_splits=10):
         # Aggregate the confusion matrices
         confusion_matrix_agg += fold_confusion_matrix    
         fold_index += 1
-    
+
     print("Done\n")
     return acc_scores_cval, acc_scores_cval, confusion_matrix_agg
