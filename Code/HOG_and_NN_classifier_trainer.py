@@ -7,7 +7,7 @@ from package_901476 import Neural_Net as nn
 
 ##You need to set the PATH_TO_DATA path to the location of the data on your machine
 dir_path = os.path.dirname(os.path.realpath(__file__))
-PATH_TO_DATA = os.path.join(dir_path,"Datastore","Supplied_Data")  #set each string as the path to the data
+PATH_TO_DATA = os.path.join(dir_path,"Datastore","Supplied")  #set each string as the path to the data
 # each string is a directory
 
 # This program expects the data to be .AVI files, held in directories named after the corrosponding label

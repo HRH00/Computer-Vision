@@ -14,32 +14,11 @@ def main():
     dataTuple = data.openSavedData(path)
     (NN_classifier,X_test,y_test, labels, NN_cross_validate) = dataTuple   
     
-    print("Testing Neural Network classifier")
-    predictions = NN_classifier.predict(X_test).astype(np.int32)
     
-    
-    print("dtype pred",predictions.dtype)
-    print("dtype y test",y_test.dtype)
-    accuracy = accuracy_score(y_test, predictions)   ###This has a problem 
-    
-#    prediction is float32
-    
-    print("Accuracy Score:", accuracy)
     
     print("Benchmarking classifier on single test sample for time ") 
     test.pred(NN_classifier,X_test) 
 
-    cm = confusion_matrix(y_test, predictions)
-    print("Confusion Matrix:")
-
-    print(cm)
-    # Precision, recall, f-score 
-    print(classification_report(y_test, predictions))
-    title="Confusion Matrix for HOG and NN Classifier"
-    
-    test.plot_confusion_matrix(cm,labels,title)
-    print("Done\n")
-    
     #####Cross validation analysis
     
     (acc_scores_cval, acc_scores_cval,agg_cm_CV) = NN_cross_validate

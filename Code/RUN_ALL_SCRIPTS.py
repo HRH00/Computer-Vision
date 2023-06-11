@@ -12,6 +12,7 @@ def main():
     run_script("HOG_and_SVM_classifier_trainer", HOG_and_SVM_classifier_trainer.main)
     run_script("HOG_and_SVM_classifier_tester", HOG_and_SVM_classifier_tester.main)
     run_script("SIFT_and_SVM_classifier_trainer", SIFT_and_SVM_classifier_trainer.main)
+    
     run_script("SIFT_and_SVM_classifier_tester", SIFT_and_SVM_classifier_tester.main)
     run_script("HOG_and_NN_classifier_trainer", HOG_and_NN_classifier_trainer.main)
     run_script("HOG_and_NN_classifier_tester", HOG_and_NN_classifier_tester.main)

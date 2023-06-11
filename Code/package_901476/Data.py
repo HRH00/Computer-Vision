@@ -16,7 +16,7 @@ def getFilePaths(PATH_TO_DATA, labels,FILE_EXTENTION):#creates a 2D array of pat
                 if avi_not_corrupt(item_path):
                     label_data.append(item_path)
         print("Found",len(label_data),"Files ending in",FILE_EXTENTION,"for Label,",label)
-        all_data.append(label_data)   
+        all_data.append(label_data)
 
 
     for data in all_data:
@@ -35,17 +35,17 @@ def avi_not_corrupt(file_path):
 
 def getLabels(PATH_TO_DATA):# Creates a list of labels, sourced from each child directory names in the specified path 
     print("Getting Labels")
-    directories = []
+    labels = []
     try:
         for item in os.listdir(PATH_TO_DATA):
             item_path = os.path.join(PATH_TO_DATA, item)
             if os.path.isdir(item_path):
-                directories.append(item)                
+                labels.append(item)                
     except Exception as e:
-        print(", No data found\n\n",e)
+        print("No data found\n\n",e)
     else:
-        print("Labels:", directories)
-    return directories
+        print("Labels:", labels)
+    return labels
 
 def enumerateLabels(labels):#Creates a list of integers which corrolate with the labels list, 
     print("Enumerating Labels")
