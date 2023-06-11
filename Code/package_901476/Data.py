@@ -21,7 +21,7 @@ def getFilePaths(PATH_TO_DATA, labels,FILE_EXTENTION):#creates a 2D array of pat
 
     for data in all_data:
         if not (data):
-            fileError()                       
+            fileError(PATH_TO_DATA)                       
     if not all_data:
         print("Error: No files found in at least one label directory")
     return all_data

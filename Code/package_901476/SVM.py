@@ -23,7 +23,8 @@ def test_svm(svm_classifier, X_test, y_test):
     print("Done\n")
     from sklearn.metrics import confusion_matrix
 
-def cross_validate_svm(features, labels, n_splits=10):
+def cross_validate_svm(features, labels):
+    n_splits=10
     print("Performing cross-validation on SVM classifier")
     # Convert to np arrays
     features = np.array(features)
@@ -36,8 +37,10 @@ def cross_validate_svm(features, labels, n_splits=10):
     kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
     acc_scores_cval = []
     
-    num_labels = len(labels)
-    
+
+    unique_labels = np.unique(labels)
+    num_labels = len(unique_labels)
+        
     # Initialize an empty confusion matrix with the correct shape
     confusion_matrix_agg = np.zeros((num_labels, num_labels))
     
