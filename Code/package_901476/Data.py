@@ -3,7 +3,8 @@ import pickle
 import cv2 as cv
 import pickle
 
-def getFilePaths(PATH_TO_DATA, labels,FILE_EXTENTION):#creates a 2D array of paths, the first index corrolates with each label integer
+#creates a 2D array of paths, the first index corrolates with each label integer
+def getFilePaths(PATH_TO_DATA, labels,FILE_EXTENTION):
     print("Getting File Paths")
     all_data=[]  
     
@@ -18,7 +19,7 @@ def getFilePaths(PATH_TO_DATA, labels,FILE_EXTENTION):#creates a 2D array of pat
         print("Found",len(label_data),"Files ending in",FILE_EXTENTION,"for Label,",label)
         all_data.append(label_data)
 
-
+    ##Error checking
     for data in all_data:
         if not (data):
             fileError(PATH_TO_DATA)                       
