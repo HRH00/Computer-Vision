@@ -1,7 +1,12 @@
 import cv2 as cv
 import numpy as np
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MiniBatchKMeans
+from sklearn.discriminant_analysis import StandardScaler
+from torch import cdist
 import package_901476.Data as data
+import package_901476.Hog as hog
+import scipy
+
 
 # Sift Functions 
 def SIFTAnalysisOnMHI(mhi):
@@ -31,9 +36,9 @@ def SIFTAnalysisOnMHI_Array(MHIArray):
         for mhi in label:
             keypoint, descriptor = SIFTAnalysisOnMHI(mhi)
             if descriptor is not None:
-                sublist_keypoints.extend(keypoint)
-                sublist_descriptors.extend(descriptor)
-                sublist_nums.extend([x]*len(descriptor))
+                sublist_keypoints.append(keypoint)
+                sublist_descriptors.append(descriptor)
+                sublist_nums.append(x)
             
         x += 1
         keypoints.append(sublist_keypoints)
@@ -47,3 +52,62 @@ def SIFTAnalysisOnMHI_Array(MHIArray):
     return keypoints, descriptors, nums
 
 
+def doSift(MHI_array):
+      
+    descriptors = []
+    flat_mhi = [] # flatten
+    Sift = cv.SIFT_create()
+    int_label = 0
+    
+    
+    
+    for lab in MHI_array:
+        for image in lab:
+            kpoint, descriptor = Sift.detectAndCompute(image, None)
+            descriptors.append(descriptor)
+            flat_mhi.append(image)
+            int_label += 1
+    
+    
+    #stack vertically   
+    descriptors = np.vstack(descriptors)
+    
+    
+    #convert ot float32 for kmeans
+    float_descriptor = descriptors.astype(np.float32)
+    
+    clusters = 100
+    
+    print("True on NAN Error: ",np.any(np.isnan(float_descriptor))) # Return True if any NaN values)
+    print("True on INF Error: ",np.any(np.isinf(float_descriptor))) # Return True if any inf values)
+    voc, var = scipy.cluster.vq.kmeans(float_descriptor, clusters, 1)
+    
+    
+    
+    image_features = np.zeros((len(MHI_array), clusters), "float32")
+    for i in range(len(MHI_array)):
+        words, distance = scipy.cluster.vq.vq(float_descriptor, voc)
+        for w in words:
+            image_features[i][w] += 1
+    
+    num_of_ocs = np.sum((image_features > 0), axis=0) # vectorisation
+    inverse_doc_Frequency = np.array(np.log((1.0*len(MHI_array)+1) / (1.0*num_of_ocs + 1)), 'float32')
+
+    # Weight the image_features with idf
+    image_features = image_features * inverse_doc_Frequency
+
+    scaler = StandardScaler().fit(image_features)
+    image_features = scaler.transform(image_features)
+    
+  # Create labels
+    num_labels = []
+    for i, lab in enumerate(image_features):
+        subnum = [i]*len(lab)  # All descriptors from this image get the same label 'i'
+        num_labels.extend(subnum)  # Using extend instead of append
+    num_labels = np.array(num_labels)
+
+    num_labels=np.array(num_labels).reshape(-1)
+    features = np.array(image_features).reshape(-1,1)    # reshape to (600,)
+    
+    return features, num_labels
+    

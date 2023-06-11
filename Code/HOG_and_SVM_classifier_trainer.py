@@ -31,6 +31,9 @@ def main():
     hog_features, numerical_labels = hog.extract_hog_features(MHI_array)
     
     #K-fold cross validation
+    import numpy
+    print(numpy.array(hog_features).shape)
+    print(numpy.array(numerical_labels).shape)
     
     SVM_cross_validate = svm.cross_validate_svm(hog_features, numerical_labels)
     

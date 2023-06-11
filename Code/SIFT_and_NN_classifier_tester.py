@@ -5,29 +5,29 @@ from package_901476 import test
 from package_901476 import Data as data
 
 def main():
-    print("Testing SIFT and SVM Classifier")
-    # Test SVM classifier
-    # Open the SVM classifier and test data unseen by the classifier``
+    print("Testing SIFT and nn Classifier")
+    # Test nn classifier
+    # Open the nn classifier and test data unseen by the classifier``
 
     
     
     try:
         cwd = os.getcwd()  
-        path = os.path.join(cwd,"SIFT_svm_classifier.pkl")
+        path = os.path.join(cwd,"SIFT_nn_classifier.pkl")
         print("\n",path,"\n")
 
         dataTuple = data.openSavedData(path)
-        (svm_classifier,X_test,y_test, labels,SVM_cross_validate) = dataTuple   
+        (nn_classifier,X_test,y_test, labels,nn_cross_validate) = dataTuple   
 
 
         
-        print("Testing Standard SVM classifier")
-        predictions = svm_classifier.predict(X_test)
+        print("Testing Standard nn classifier")
+        predictions = nn_classifier.predict(X_test)
         accuracy = accuracy_score(y_test, predictions)
         print("Accuracy Score:", accuracy)
         
         print("Classify one image") 
-        test.pred(svm_classifier,[X_test[0]]) 
+        test.pred(nn_classifier,[X_test[0]]) 
 
         cm = confusion_matrix(y_test, predictions)
         print("Confusion Matrix:")
@@ -35,25 +35,25 @@ def main():
         print(cm)
         # Precision, recall, f-score 
         print(classification_report(y_test, predictions))
-        title="Confusion Matrix for SIFT and SVM Classifier"
+        title="Confusion Matrix for SIFT and nn Classifier"
         
         test.plot_confusion_matrix(cm,labels,title)
         print("Done\n")
         
         #####Cross validation analysis
         
-        (acc_scores_cval, acc_scores_cval,agg_cm_CV) = SVM_cross_validate
+        (acc_scores_cval, acc_scores_cval,agg_cm_CV) = nn_cross_validate
         print("Confusion Matrix Cross Validation:")
         
         print(agg_cm_CV)
-        title="Aggregate Consufion Matrix - SIFT+SVM Classifier with Cross Validation"
+        title="Aggregate Consufion Matrix - SIFT+nn Classifier with Cross Validation"
         test.plot_confusion_matrix(agg_cm_CV,labels,title)
-        print("\nTesting SVM classifier with Cross Validation")
-        print(f'SVM Cross Validation Average accuracy : {np.mean(acc_scores_cval)}')
+        print("\nTesting nn classifier with Cross Validation")
+        print(f'nn Cross Validation Average accuracy : {np.mean(acc_scores_cval)}')
         
 
     except: # ERROR
-        print("ERROR - run SIFT_and_SVM_classifier_trainer.py in same directory as this file first")
+        print("ERROR - run SIFT_and_NN_classifier_trainer.py in same directory as this file first")
         print("If this doesn\'t work, then something has gone very wrong")
     print("\nDONE - exiting program")
 
