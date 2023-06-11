@@ -23,9 +23,9 @@ def main():
     MHI_DURATION= 1
     MHI_array=mhi.getMHIFromFilePathArray(filePathArray, Min_Delta,Max_Delta, MHI_DURATION)
 
-    (keypoints, descriptors) = Sift.SIFTAnalysisOnMHI_Array(MHI_array)
+    (keypoints, descriptors, numerical_labels) = Sift.SIFTAnalysisOnMHI_Array(MHI_array)
     
-    features, numerical_labels = Sift.compute_image_features(keypoints,descriptors, 100)
+    features = Sift.compute_image_features(keypoints,descriptors, 100)
     
     #K-fold cross validation
     
