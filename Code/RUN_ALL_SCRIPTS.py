@@ -1,10 +1,12 @@
 import HOG_and_SVM_classifier_tester
 import HOG_and_SVM_classifier_trainer
-import SIFT_and_SVM_classifier_tester
-import SIFT_and_SVM_classifier_trainer
 import HOG_and_NN_classifier_tester
 import HOG_and_NN_classifier_trainer
 
+import SIFT_and_SVM_classifier_tester
+import SIFT_and_SVM_classifier_trainer
+import SIFT_and_NN_classifier_tester
+import SIFT_and_NN_classifier_trainer
 
 Program_Issues=[]
 def main():
@@ -17,6 +19,8 @@ def main():
 
     run_script("SIFT_and_SVM_classifier_trainer", SIFT_and_SVM_classifier_trainer.main)
     run_script("SIFT_and_SVM_classifier_tester", SIFT_and_SVM_classifier_tester.main)
+    run_script("SIFT_and_NN_classifier_trainer", SIFT_and_NN_classifier_trainer.main)
+    run_script("SIFT_and_NN_classifier_tester", SIFT_and_NN_classifier_tester.main)
 
 
     print("Done Running all scripts\n\n")

@@ -46,7 +46,7 @@ def main():
         print("Confusion Matrix Cross Validation:")
         
         print(agg_cm_CV)
-        title="Aggregate Consufion Matrix - HOG+SVM Classifier with Cross Validation"
+        title="Aggregate Confusion Matrix - HOG+SVM Classifier with Cross Validation"
         test.plot_confusion_matrix(agg_cm_CV,labels,title)
         print("\nTesting SVM classifier with Cross Validation")
         print(f'SVM Cross Validation Average accuracy : {np.mean(acc_scores_cval)}')
