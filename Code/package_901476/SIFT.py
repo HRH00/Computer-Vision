@@ -65,10 +65,13 @@ def doSift(MHI_array):
             
             data.showImageForXms("Keypoints", img_with_keypoints, 5)
             data.showImageForXms("Frame",image,1)
-            descriptors.append(descriptor)
-            flat_mhi.append(image)
+            
+            if descriptor is not None:
+                descriptors.append(descriptor)  
+                flat_mhi.append(image)
             int_label += 1
     
+    cv.destroyAllWindows()
     
     #stack vertically   
     descriptors = np.vstack(descriptors)
@@ -110,7 +113,8 @@ def doSift(MHI_array):
     num_labels=np.array(num_labels).reshape(-1)
     features = np.array(image_features).reshape(-1,1)    # reshape to (600,)
     
-    cv.destroyAllWindows()
-    
+   
+
+        
     return features, num_labels
     
