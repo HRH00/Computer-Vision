@@ -61,6 +61,10 @@ def doSift(MHI_array):
     for lab in MHI_array:
         for image in lab:
             kpoint, descriptor = Sift.detectAndCompute(image, None)
+            img_with_keypoints = cv.drawKeypoints(image, kpoint, None,flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+            
+            data.showImageForXms("Keypoints", img_with_keypoints, 5)
+            data.showImageForXms("Frame",image,1)
             descriptors.append(descriptor)
             flat_mhi.append(image)
             int_label += 1
@@ -105,6 +109,8 @@ def doSift(MHI_array):
 
     num_labels=np.array(num_labels).reshape(-1)
     features = np.array(image_features).reshape(-1,1)    # reshape to (600,)
+    
+    cv.destroyAllWindows()
     
     return features, num_labels
     

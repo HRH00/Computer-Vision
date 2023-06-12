@@ -23,6 +23,8 @@ os, pickle, sys & time modules should already be accessible in the python librar
 A package of helper functions has been made, package_901476 - make sure this package directory is placed 
 inside the same directory that the indivudual scripts are called from.
 
-If you change the data set, that path needs to be updated in each "trainer.py" script, ensure you delete the 
-old MHI_array.pkl or the program may use previous datasets. The data set must be relativly small in size due
-to 'pickle' 10MB file size limitation, data could be cached using other means as an improvement
+If you change the data set, that path needs to be updated in each "trainer.py" script.
+Alternativly, just copy the dataset into the Datastore/Supplied Directory.
+Ensure you deleted the old MHI_array.pkl or the program may use previous datasets. The data set must be 
+relativly small in size due to 'pickle' 10MB file size limitation, data could be cached using other means as an improvement.
+
