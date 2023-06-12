@@ -31,6 +31,12 @@ def main():
             print(f"\033[91m{i}: Failed To Run\033[0m")
     for i in Program_Ran:
         print("\033[92mRan to completion:\t",i,"\033[0m")
+    if not Program_Issues:
+        print("\033[92mAll Ran\033[0m")
+    else:
+        print(f"\033[91mProblems Encountered\033[0m")
+        
+        
 
 
 def run_script(script_name, main_function):
