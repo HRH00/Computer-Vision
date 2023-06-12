@@ -12,7 +12,7 @@ def main():
     
     
     try:
-        cwd = os.getcwd()  
+        cwd = os.getcwd()  #load data 
         path = os.path.join(cwd,"Hog_svm_classifier.pkl")
         print("\n",path,"\n")
 
@@ -22,9 +22,9 @@ def main():
 
         
         print("Testing Standard SVM classifier")
-        predictions = svm_classifier.predict(X_test)
+        predictions = svm_classifier.predict(X_test) # make predictions on test set
         accuracy = accuracy_score(y_test, predictions)
-        print("Accuracy Score:", accuracy)
+        print("Accuracy Score:", accuracy) # output accuracy score
         
         print("Classify one image") 
         test.pred(svm_classifier,[X_test[0]]) 

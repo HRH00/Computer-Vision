@@ -21,7 +21,6 @@ def test_svm(svm_classifier, X_test, y_test):
     accuracy = accuracy_score(y_test, predictions)
     print("Accuracy:", accuracy)
     print("Done\n")
-    from sklearn.metrics import confusion_matrix
 
 def cross_validate_svm(features, labels):
     print("Performing cross-validation on SVM classifier")

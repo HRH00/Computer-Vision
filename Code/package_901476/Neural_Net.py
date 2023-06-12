@@ -61,13 +61,15 @@ def cross_validate_nn(features, labels, n_splits=10):
         # Create a neural network model
         model = Sequential()
         model.add(Dense(64, activation='relu', input_dim=X_train_cval.shape[1]))
+        
         model.add(Dense(num_labels, activation='softmax'))
+        
         model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
         # Train the model on the training data
         model.fit(X_train_cval, y_train_cval, epochs=10, batch_size=32, verbose=0)
 
-        # Predict the labels for the testing data
+        # Predict the labels on testing data
         predictions = np.argmax(model.predict(X_test_cval), axis=-1)
 
         # Calculate the accuracy for the current fold

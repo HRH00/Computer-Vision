@@ -1,5 +1,3 @@
-import cv2
-import numpy as np
 import package_901476.SVM as SVM
 import package_901476.Motion_History as mhi
 import package_901476.Sift as Sift

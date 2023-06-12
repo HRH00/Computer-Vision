@@ -56,7 +56,7 @@ def getMHIFromVideo(video_path, MIN_DELTA, MAX_DELTA, MHI_DURATION):
 
     cap.release()
 
-    # Normalize to [0,255] and convert type
+    # Normalize to [0,255] , convert to uint8
     mhi_uint8 = cv.normalize(mhi, None, 0, 255, cv.NORM_MINMAX, dtype=cv.CV_8U)
 
     # Return the uint8 MHI

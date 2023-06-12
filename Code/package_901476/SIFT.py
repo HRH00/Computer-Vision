@@ -1,14 +1,12 @@
 import cv2 as cv
 import numpy as np
-from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.discriminant_analysis import StandardScaler
-from torch import cdist
 import package_901476.Data as data
 import package_901476.Hog as hog
 import scipy
 
 
-# Sift Functions 
+# initial sift function, not used anymore 
 def SIFTAnalysisOnMHI(mhi):
     sift = cv.SIFT_create()
     # Detect keypoints and compute descriptors
@@ -58,8 +56,7 @@ def doSift(MHI_array):
     flat_mhi = [] # flatten
     Sift = cv.SIFT_create()
     int_label = 0
-    
-    
+        
     
     for lab in MHI_array:
         for image in lab:
